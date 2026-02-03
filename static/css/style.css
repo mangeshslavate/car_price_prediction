@@ -1,0 +1,27 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Background */
+.bg-dark {
+    background-color: #75767B !important;
+}
+
+/* Margin utility */
+.mt-50 {
+    margin-top: 50px;
+}
+
+/* Card styling */
+.card {
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.card-header {
+    background-color: #343a40;
+    color: white;
+}

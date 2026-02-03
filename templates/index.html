@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Car Price Predictor</title>
+
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="bg-dark">
+
+<div class="container">
+    <div class="row">
+        <div class="card mt-50 w-100">
+            <div class="card-header text-center">
+                <h2>Car Price Predictor</h2>
+            </div>
+
+            <div class="card-body">
+
+                <form id="predictForm">
+
+                    <!-- Company -->
+                    <div class="form-group text-center">
+                        <label><b>Select Company</b></label>
+                        <select class="form-control" id="company" name="company"
+                                onchange="loadCarModels()" required>
+                            {% for company in companies %}
+                            <option value="{{ company }}">{{ company }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Model -->
+                    <div class="form-group text-center">
+                        <label><b>Select Model</b></label>
+                        <select class="form-control" id="car_models" name="car_models" required>
+                            <option value="">Select Model</option>
+                        </select>
+                    </div>
+
+                    <!-- Year -->
+                    <div class="form-group text-center">
+                        <label><b>Year of Purchase</b></label>
+                        <select class="form-control" name="year" required>
+                            {% for year in years %}
+                            <option value="{{ year }}">{{ year }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Fuel -->
+                    <div class="form-group text-center">
+                        <label><b>Fuel Type</b></label>
+                        <select class="form-control" name="fuel_type" required>
+                            {% for fuel in fuel_types %}
+                            <option value="{{ fuel }}">{{ fuel }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Kilometers -->
+                    <div class="form-group text-center">
+                        <label><b>Kilometres Driven</b></label>
+                        <input type="number" class="form-control"
+                               name="kilo_driven" required>
+                    </div>
+
+                    <!-- Button -->
+                    <button type="submit" class="btn btn-primary btn-block">
+                        Predict Price
+                    </button>
+
+                </form>
+
+                <h4 class="text-center mt-4">
+                    <span id="prediction"></span>
+                </h4>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const companyModelDict = {{ company_model_dict | tojson }};
+
+    function loadCarModels() {
+        const company = document.getElementById("company").value;
+        const modelSelect = document.getElementById("car_models");
+
+        modelSelect.innerHTML = "";
+
+        if (company === "Select Company") {
+            let opt = document.createElement("option");
+            opt.text = "Select Model";
+            opt.value = "";
+            modelSelect.add(opt);
+            return;
+        }
+
+        companyModelDict[company].forEach(model => {
+            let option = document.createElement("option");
+            option.text = model;
+            option.value = model;
+            modelSelect.add(option);
+        });
+    }
+
+    document.getElementById("predictForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        let formData = new FormData(this);
+        document.getElementById("prediction").innerHTML = "Predicting price...";
+
+        fetch("/predict", {
+            method: "POST",
+            body: formData
+        })
+        .then(res => res.text())
+        .then(data => {
+            document.getElementById("prediction").innerHTML =
+                "Estimated Price: ₹ " + data;
+        });
+    });
+</script>
+
+</body>
+</html>
